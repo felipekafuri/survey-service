@@ -1,11 +1,13 @@
-import express from 'express'
-import 'reflect-metadata'
-import './database'
-import { routes } from './routes'
+import 'reflect-metadata';
+import express from 'express';
 
+import createConnection from './database';
+import { routes } from './routes';
 
-const app = express()
-app.use(express.json())
-app.use(routes)
+createConnection();
+const app = express();
 
-export { app }
+app.use(express.json());
+app.use(routes);
+
+export { app };
