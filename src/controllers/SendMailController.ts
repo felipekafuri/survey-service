@@ -26,25 +26,28 @@ class SendMailController {
 
     const npsPath = path.resolve(__dirname, '..', 'views', 'survey.template.hbs')
 
-    const variables = {
-      name: userExists.name, 
-      title: surveyExists.title, 
-      description: surveyExists.description,
-      user_id: userExists.id,
-      link: process.env.URL_MAIL
-    }
-
     const surveyUserExists = await surveysUsersRepository.findOne({
-      where: [{ user_id: userExists.id }, { value: null }],
+      where: { user_id: userExists.id ,  value: null },
       relations: ['user', 'survey'],
     });
 
 
+    const variables = {
+      name: userExists.name, 
+      title: surveyExists.title, 
+      description: surveyExists.description,
+      id: "",
+      link: process.env.URL_MAIL
+    }
+
     if(surveyUserExists){
+      variables.id = surveyUserExists.id
+
       await SendMailService.execute(email, surveyExists.title, variables, npsPath)
 
       return response.json(surveyUserExists)
     }
+
 
     const surveyUser = surveysUsersRepository.create({
       user_id: userExists.id,
@@ -53,6 +56,7 @@ class SendMailController {
 
     await surveysUsersRepository.save(surveyUser)
 
+    variables.id = surveyUser.id;
 
     await SendMailService.execute(email, surveyExists.title, variables, npsPath)
 
