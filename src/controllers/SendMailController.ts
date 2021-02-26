@@ -5,6 +5,7 @@ import { SurveysUsersRepository } from '../repositories/SurveysUsersRepository'
 import { UsersRepository } from '../repositories/UsersRepository'
 import SendMailService from '../services/SendMailService'
 import path from 'path'
+import AppError from '../errors/AppError'
 
 class SendMailController {
 
@@ -19,10 +20,10 @@ class SendMailController {
     const surveyExists = await surveysRepository.findOne({where:{id: survey_id}})
     
     if(!userExists) 
-    return response.status(400).json({error: 'User does not exists'})
+    throw new AppError( 'User does not exists')
 
     if(!surveyExists) 
-    return response.status(400).json({error: 'Survey does not exists'})
+    throw new AppError('Survey does not exists')
 
     const npsPath = path.resolve(__dirname, '..', 'views', 'survey.template.hbs')
 
